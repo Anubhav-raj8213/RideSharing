@@ -63,6 +63,16 @@ const registerUser = async (req, res) => {
 
 const loginUser = async(req,res) => {
     try{
+
+        const existingToken = req.cookies?.token;
+
+        if(existingToken){
+            const validToken = jwt.verify(existingToken, secretKey);
+            if(validToken) return res.status(400).json({
+                message:"User already logged in"
+            })
+        }
+
         const {email,password} = req.body;
 
         if(!email || !password) return res.status(400).json({
