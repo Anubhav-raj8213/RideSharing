@@ -28,7 +28,7 @@ const registerUser = async (req, res) => {
                 message:"User already exists"
             })
         }
-        console.log("User registration controller worked till here")
+        // console.log("User registration controller worked till here")
         const newUser = await User.create({
             fullName:{
                 firstName,
@@ -120,7 +120,29 @@ const loginUser = async(req,res) => {
     }
 }
 
+
+const getUserProfile = async(req,res) => {
+    try{
+        const user = req.user;
+        if(!user) return res.status(400).json({
+            message:"User not found"
+        })
+        const userResponse = user.toObject();
+        delete userResponse.password;
+        return res.status(200).json({
+            user:userResponse
+        })
+    }
+    catch(error){
+        return res.status(500).json({
+            message:"Something went wrong while fetching user profile",
+            error:error.message
+        })
+    }
+}
+
 export {
     registerUser,
-    loginUser
+    loginUser,
+    getUserProfile
 }

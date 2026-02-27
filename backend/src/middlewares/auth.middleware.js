@@ -3,11 +3,12 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
+import cookieParser from "cookie-parser";
 const secretKey = process.env.JWT_SECRET_KEY;
 
 const authMiddleware = async(req,res,next) => {
     try{
-        const token = req.cookies.token || req.header("Authorization").replace("Bearer", "");
+        const token = req.cookies.token || req.headers?.authorization.split(" ")[1];
         if(!token){
             return res.status(401).json({
                 message:"Unauthorized, token not found"
@@ -33,3 +34,5 @@ const authMiddleware = async(req,res,next) => {
         })
     }
 }
+
+export default authMiddleware;
