@@ -108,3 +108,42 @@ Registers a new user in the system.
 - **Error Responses**:
   - `400 Bad Request`: If validation fails (e.g., missing fields, invalid email, short password) or if the user already exists.
   - `500 Internal Server Error`: For any other server-side errors.
+
+### User Login
+
+Authenticates a user and returns a JWT token.
+
+- **URL**: `/api/users/login`
+- **Method**: `POST`
+- **Request Body**:
+
+  ```json
+  {
+    "email": "john.doe@example.com",
+    "password": "password123"
+  }
+  ```
+
+- **Success Response (200 OK)**:
+
+  Sets an `httpOnly` cookie with the JWT and returns a JSON object with the user's information and the token.
+
+  ```json
+  {
+    "message": "User logged in successfully",
+    "user": {
+      "fullName": {
+        "firstName": "John",
+        "lastName": "Doe"
+      },
+      "email": "john.doe@example.com",
+      "_id": "60d0fe4f5311236168a109ca",
+      "__v": 0
+    },
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+  ```
+
+- **Error Responses**:
+  - `400 Bad Request`: If validation fails, credentials are invalid, or user does not exist.
+  - `500 Internal Server Error`: For any other server-side errors.
