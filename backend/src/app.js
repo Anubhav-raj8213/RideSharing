@@ -3,8 +3,10 @@ import dotenv from "dotenv";
 dotenv.config();
 import cors from "cors";
 import mongoose from "mongoose";
-import connectDB from "./utils/db.js";
 const app = express();
+import connectDB from "./utils/db.js";
+
+await connectDB();
 
 app.use(cors());
 app.use(express.json());
