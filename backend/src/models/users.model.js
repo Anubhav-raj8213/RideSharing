@@ -24,23 +24,23 @@ const userSchema = new mongoose.Schema({
     },
     password:{
         type:String,
-        required:true
+        required:true,
+        select:false
     },
     socketId:{
         type:String,
     },
 })
 
-userSchema.pre("save", async function(next){
-    if(!this.isModified("password")) return next();
+userSchema.pre("save", async function(){
+    if(!this.isModified("password")) return ;
     this.password = await bcrypt.hash(this.password, 10);
-    next();
 });
 
 const secretKey = process.env.JWT_SECRET_KEY;
 
 
-userSchema.methods.generateToken  = async function(){
+userSchema.methods.generateToken  = function(){
     const token = jwt.sign({userId:this._id}, secretKey, {expiresIn:"1d"});
     return token;
 }

@@ -4,15 +4,16 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
+import {body, validationResult} from "express-validator";
 const secretKey = process.env.JWT_SECRET_KEY;
 
 const registerUser = async (req, res) => {
     try{
         const {fullName:{firstName, lastName}, email, password} = req.body;
-        const existingUser = await User.findOne({email});
-        if(existingUser){
+        const errors = validationResult(req);
+        if(!errors.isEmpty()){
             return res.status(400).json({
-                message:"User already exists"
+                errors:errors.array()
             })
         }
         if(!firstName || !email || !password){
@@ -20,6 +21,14 @@ const registerUser = async (req, res) => {
                 message:"All fields are required"
             })
         }
+
+        const existingUser = await User.findOne({email});
+        if(existingUser){
+            return res.status(400).json({
+                message:"User already exists"
+            })
+        }
+        console.log("User registration controller worked till here")
         const newUser = await User.create({
             fullName:{
                 firstName,
@@ -29,16 +38,19 @@ const registerUser = async (req, res) => {
             password
         })
 
-        const token = await newUser.generateToken();
+        const token = newUser.generateToken();
         const options = {
             expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
             httpOnly:true,
             secured:true
         }
         res.cookie("token", token, options);
+        const userResponse = newUser.toObject();
+        delete userResponse.password;
         return res.status(201).json({
             message:"User registered successfully",
-            user:newUser
+            user:userResponse,
+            token
         })
     }
     catch(error){
@@ -47,4 +59,8 @@ const registerUser = async (req, res) => {
             message:"Something went wrong during user registration"
         });
     }
+}
+
+export {
+    registerUser
 }
