@@ -61,6 +61,56 @@ const registerUser = async (req, res) => {
     }
 }
 
+const loginUser = async(req,res) => {
+    try{
+        const {email,password} = req.body;
+
+        if(!email || !password) return res.status(400).json({
+            message:"All fields are required"
+        })
+
+        const errors = validationResult(req);
+
+        if(!errors.isEmpty()) return res.status(400).json({
+            errors:errors.array()
+        })
+
+        const user = await User.findOne({email}).select("+password");
+
+        if(!user){
+            return res.status(400).json({
+                message:"User does not exist, please register first"
+            })
+        }
+
+        if(!(await user.comparePassword(password))) return res.status(400).json({
+            message:"Invalid credentials"
+        }) 
+
+        const token = user.generateToken();
+        const options = {
+            expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+            httpOnly:true,
+            secured:true
+        }
+        res.cookie("token", token, options);
+        const userResponse = user.toObject();
+        delete userResponse.password;
+        return res.status(200).json({
+            message:"User logged in successfully",
+            user:userResponse,
+            token
+        })
+    }
+    catch(error){
+        return res.status(500).json({
+            message:"Something went wrong during user login",
+            error:error.message
+        })
+    }
+}
+
 export {
-    registerUser
+    registerUser,
+    loginUser
 }
