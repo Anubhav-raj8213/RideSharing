@@ -147,3 +147,50 @@ Authenticates a user and returns a JWT token.
 - **Error Responses**:
   - `400 Bad Request`: If validation fails, credentials are invalid, or user does not exist.
   - `500 Internal Server Error`: For any other server-side errors.
+
+### User Profile
+
+Retrieves the profile information of the currently authenticated user.
+
+- **URL**: `/api/users/profile`
+- **Method**: `GET`
+- **Headers**:
+  - `Authorization`: `Bearer <token>` (Optional if `token` cookie is set)
+- **Success Response (200 OK)**:
+
+  ```json
+  {
+    "user": {
+      "fullName": {
+        "firstName": "John",
+        "lastName": "Doe"
+      },
+      "email": "john.doe@example.com",
+      "_id": "60d0fe4f5311236168a109ca",
+      "__v": 0
+    }
+  }
+  ```
+
+- **Error Responses**:
+  - `401 Unauthorized`: If the token is missing, invalid, or blacklisted.
+  - `500 Internal Server Error`: For server-side errors.
+
+### User Logout
+
+Logs out the user by blacklisting the current token and clearing the cookie.
+
+- **URL**: `/api/users/logout`
+- **Method**: `POST`
+- **Headers**:
+  - `Authorization`: `Bearer <token>` (Optional if `token` cookie is set)
+- **Success Response (200 OK)**:
+
+  ```json
+  {
+    "message": "User logged out successfully"
+  }
+  ```
+
+- **Error Responses**:
+  - `500 Internal Server Error`: For server-side errors.
