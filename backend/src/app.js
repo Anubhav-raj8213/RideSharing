@@ -5,7 +5,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 const app = express();
 import connectDB from "./utils/db.js";
-import { usersRoutes } from "./routes/index.js";
+import { usersRoutes, captainRoutes } from "./routes/index.js";
 import cookieParser from "cookie-parser";
 
 await connectDB();
@@ -18,9 +18,13 @@ app.use(cookieParser());
 //Route for rhe user registration
 app.use("/api/users", usersRoutes);
 
+//routes for captain
+app.use("/api/captain", captainRoutes);
+
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
+
 
 
 
