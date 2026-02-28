@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 import cookieParser from "cookie-parser";
+import BlacklistedToken from "../models/blackListedToken.model.js";
 const secretKey = process.env.JWT_SECRET_KEY;
 
 const authMiddleware = async(req,res,next) => {
@@ -12,6 +13,13 @@ const authMiddleware = async(req,res,next) => {
         if(!token){
             return res.status(401).json({
                 message:"Unauthorized, token not found"
+            })
+        }
+
+        const blackListedToken = await BlacklistedToken.findOne({token});
+        if(blackListedToken){
+            return res.status(401).json({
+                message:"Unauthorized, token is blacklisted"
             })
         }
         

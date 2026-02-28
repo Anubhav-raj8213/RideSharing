@@ -1,4 +1,4 @@
-import {User} from "../models/index.js"
+import {User, BlacklistedToken} from "../models/index.js"
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -141,8 +141,36 @@ const getUserProfile = async(req,res) => {
     }
 }
 
+const logoutUser = async(req,res) => {
+    try{
+        const token = req.cookies?.token || req.headers?.authorization.split(" ")[1];
+        if(!token) return res.status(200).json({
+            message:"User logged out successfully"
+        })
+        const isTokenBlacklisted = await BlacklistedToken.findOne({token});
+        if(isTokenBlacklisted) return res.status(200).json({
+            message:"User already logged out"
+        })
+        const blacklistedToken = new BlacklistedToken({
+            token
+        })
+        await blacklistedToken.save();
+        res.clearCookie("token");
+        return res.status(200).json({
+            message:"User logged out successfully"
+        })
+    }
+    catch(error){
+        return res.status(500).json({
+            message:"Something went wrong during user logout",
+            error:error.message
+        })
+    }
+}
+
 export {
     registerUser,
     loginUser,
-    getUserProfile
+    getUserProfile,
+    logoutUser
 }
